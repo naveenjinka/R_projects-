@@ -1,0 +1,36 @@
+#Regression Trees:
+
+# Libraries used to compute Regression Trees
+library(rpart)
+library(rpart.plot)
+
+#The data set "msleep" is in the package ggplot
+library(ggplot2)
+
+data(msleep)
+str(msleep)
+
+# create a new data frame with the necessary variables.
+
+df <- msleep[, c(3,6,10,11)]
+str(df)
+
+#Building a Regression tree model, by considering all the variables.
+
+m1 <- rpart(sleep_total ~ ., data = df, method = "anova")
+
+# To visulize the regression tree we use the rpart.plt function.
+
+rpart.plot(m1, type = 3, digits = 3, fallen.leaves = TRUE)
+
+#prediction 
+
+p1 <- predict(m1, df)
+p1
+
+#Computing the Accuracy: MEAN ABSOLUTE ERROR : MEAN OF DIFF OF ACTUAL AND PREDICTED VALUES. 
+
+MAE <- function(actual, predicted) {mean(abs(actual - predicted))}        
+MAE
+
+MAE(df$sleep_total, p1)
