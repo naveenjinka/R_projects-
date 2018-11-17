@@ -1,0 +1,34 @@
+#Libraries used to build a classification trees
+
+library(rpart)
+library(rpart.plot)
+
+data(iris)
+str(iris)
+
+set.seed(9850)
+
+# Creating a random uniform numbers, length of the nrow(iris) data.
+g <- runif(nrow(iris))
+
+# Randomising the data by re-ordering, the order depends on the random numbers created.
+
+irisr <- iris[order(g), ]  #shuffled data
+
+#Building a classification tree model by using 100 objetcs out of 150 objects.
+
+modelm3 <- rpart(Species ~ . , data = irisr[1:100, ] , method = "class")
+
+#Vizulize the classification tress by using rpart.pat function.
+
+rpart.plot(m3, type = 3, extra = 101, fallen.leaves = TRUE)
+
+summary(m3)
+
+#prediction the model by using a last 50 objects as a test data.
+
+p1 <- predict(m3, irisr[101:150,], type = "class")
+
+#confision matrix.
+
+table(irisr[101:150,5], p1)
