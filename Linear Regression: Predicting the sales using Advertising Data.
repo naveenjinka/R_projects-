@@ -1,0 +1,95 @@
+# 1. Linear Regression Predicting the Sales using Advertising Data
+
+# Source Data
+Addv <- read.csv("C:\\Users\\naveenjv\\Desktop\\itas\\Advertising.csv") 
+View(Addv)
+str(Addv)
+
+#Load the library ggplot to visulize the model.
+
+library(ggplot2)
+
+#Use lm function linear model which can be used to create simple regression model. Here we use TV as a co-efficient(Independent Variable).
+
+linearMod <- lm(sales ~ TV , data=Addv)
+
+summary(linearMod)
+
+#Grafical visulization of linear model: predicting the "sales" usnig "TV" as a co-efficient.
+
+g <- ggplot(Addv, aes(sales, TV))
+
+g + geom_jitter(aes(col =sales, size = TV)) + 
+  geom_smooth(aes(col = sales), method = "lm", se=F)
+
+# 2. Here we use "Radio" as a co-efficient(Independent Variable).
+
+linearMod1 <- lm(sales ~ radio, data=Addv)
+
+summary(linearMod1)
+
+#Grafical visulization of linear model: predicting the "sales" usnig "Radio" as a co-efficient.
+
+g <- ggplot(Addv, aes(sales, radio))
+
+g + geom_jitter(aes(col =radio, size = sales)) + 
+  geom_smooth(aes(col = radio), method = "lm", se=F)
+
+#Here we use "Newspaper" as a co-efficient(Independent Variable).
+
+linearMod2 <- lm(sales ~ newspaper, data=Addv)
+
+summary(linaerMod2)
+
+#Grafical visulization of linear model: predicting the "sales" usnig "Newspaper" as a co-efficient.
+
+g <- ggplot(Addv, aes(sales, newspaper))
+
+g + geom_jitter(aes(col =sales, size = newspaper)) + 
+  geom_smooth(aes(col = sales), method = "lm", se=F)
+
+#Muiltiple Linear Regression.
+#Predicting Sales using all the coefficients.
+
+linearMod3 <- lm(sales ~ TV+radio+newspaper, data = Addv)
+
+# Using Predict function we can predict the sales, below is the an example using random values to the co-efficnts and predicting the sales.
+
+predict(linearMod, data.frame("TV" = 100, "radio" = 75, "newspaper" = 25))
+
+# Train and Test data.
+
+# we use TV as a co-efficient.
+
+set.seed(123)
+# creating a sample data: Splitting a data into test and train data.
+
+ind <- sample(2, nrow(Addv) , replace = TRUE, prob = c(0.7,0.3)) 
+
+train <- Addv[ind==1,]
+test <- Addv[ind==2,]
+
+Model1 <- lm(sales ~ TV , data=train)
+
+#loding the necessary libraires fro the model.
+
+library(tidyverse)  # data manipulation and visualization
+library(modelr)     # provides easy pipeline modeling functions
+library(broom)      # helps to tidy up model outputs
+
+# Predictions
+(test <- test %>% 
+    add_predictions(model1))
+
+# test MSE
+test %>% 
+  add_predictions(model1) %>%
+  summarise(MSE = mean((sales - pred)^2))
+
+
+# training MSE
+train %>% 
+  add_predictions(model1) %>%
+  summarise(MSE = mean((sales - pred)^2))
+
+#End
