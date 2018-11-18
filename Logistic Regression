@@ -1,0 +1,81 @@
+#Titanic data set extracted from Kaggle website.
+#Titanic <- read.csv("C:\\Users\\naveenjv\\Desktop\\itas\\Titanic.csv")
+
+#new data frame with neccesary variables
+df <- Titanic[,c(2,4,5,7,12)]
+
+#REJECTS ALL THE records whcih says "NA" in the rows
+
+df <- na.omit(df)
+
+#Encoding the Sex varible into factor variable of 1's and 0's
+df$Sex <- ifelse(df$Sex == "male", 1,0)
+
+# convert factors to numeric
+
+for (i in 1:5) {
+   df[i] <- as.numeric(df[,i])  
+}
+
+#encode the response variable into a factor
+
+df$Survived <- as.factor(df$Survived)
+
+# shows how many 0 and 1's are there in the class variable
+
+table(df$Survived)
+
+library(caret)
+
+# Pationing: Prep Training and Test data.
+
+set.seed(123)
+
+ind <- sample(2, nrow(df), replace = TRUE, prob = c(0.7,0.3))
+
+train = df[ind == 1,]
+test = df[ind ==2,]
+
+
+table(train$Survived)
+
+set.seed(100)
+
+# downsample it using the downSample function from caret package: as the 0's and 1's are not equal we use down sample function.
+
+down_train  <- downSample(x = train[,1:4], y = train$Survived)
+
+str(down_train)
+
+#using down sample func we reduced the 0's in the class var
+
+table(down_train$Class)
+
+#Genralized Linear model: To build logistic regression model
+
+logitmod <- glm(Class ~ . , family = "binomial", data = down_train)
+summary(logitmod)
+
+#prediction
+pred <- predict(logitmod, newdata = test, type = "response")
+
+#to append the prediction col in a test data set.
+
+output <- cbind(test,pred)
+
+#The common practice is to take the probability cutoff as 0.5. If the probability of Y is > 0.5, then it can be classified an event (Surivived)
+# So if pred is greater than 0.5, the event survived else the evenut is not survived.
+
+y_pred <- ifelse(pred > 0.5, 1,0)
+y_pred <- factor(y_pred, levels=c(0, 1))
+y_act <- test$Survived
+
+mean(y_pred == y_act)
+
+# To check the accuracy and the performance of the model.
+
+library("e1071")
+confusionMatrix(y_act, y_pred)
+
+
+
