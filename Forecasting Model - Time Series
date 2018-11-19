@@ -1,0 +1,39 @@
+install.packages("forecast")
+library(forecast)
+df <- read.csv("C:\\Users\\naveenjv\\Desktop\\itas\\UKCPI.csv")
+
+View(df)
+
+#To check whether the data we are dealing is Time series data or not
+
+print(is.ts(df$UKCPI))
+
+#Time Series function
+
+df$UKCPI <- ts(df$UKCPI, start = c(1988,1), end = c(2013, 4), frequency = 4)
+
+#Differencing data
+
+diff <- diff(df$UKCPI)
+
+#grafical visulization of time series.
+
+plot(diff)
+
+#Selecting Subset of data using window function.
+
+subset <- window(diff, start = c(2001,1), end = c(2012,4))
+
+#Estimating ARMA model
+
+fit_diff_400 <- Arima(diff, order = c(4,0,0))
+Arima(df$UKCPI, order = c(4,1,0))
+
+#Forecasting ARMA model
+
+names(fit_diff_400)
+fit_diff <- auto.arima(diff, seasonal = FALSE)
+fit_diff_400 <- forecast(fit_diff_400, h = 10)
+plot(forecast(fit_diff_400, h = 10))
+
+plot(forecast(fit_diff_400,h=10), include = 40)
